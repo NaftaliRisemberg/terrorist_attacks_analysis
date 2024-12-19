@@ -13,11 +13,16 @@ def clear_all(df):
 
 def clean_missing_dates(df):
     drop_missing_dates = df[(df['imonth'] == 0) | (df['iday'] == 0)].index
-    df.drop(drop_missing_dates, inplace=False)
-    return df
+    drop_missing_dates = df.drop(drop_missing_dates, inplace=False)
+    print("ףףףף")
+    return drop_missing_dates
+
 
 def replace_missing_nperprs(df):
-    df['nperps'] = df['nperps'].map({-99: None}).fillna(df['nperps'])
+    df['nperps'] = df['nperps'].map({-99: 0})
+    df['nperps'] = df['nperps'].infer_objects()
+    df['nperps'] = df['nperps'].fillna(df['nperps'])
+
     return df
 
 def get_lat_and_long_by_location(df):
@@ -42,6 +47,7 @@ def get_lat_long(location_type, location_name):
         for feature in resp['features']:
             lat, lon = feature['geometry']['coordinates']
             return lat, lon
+        return None, None
 
     except Exception as e:
         print(f"Error message: {e}")
@@ -52,17 +58,16 @@ def fill_missing_lat_lon(df):
             if pd.notnull(row['city']) and row['city'] != "Unknown":
                 city = row['city']
                 lat, lon = get_lat_long('city', city)
-                if lat is not None and lon is not None:
-                    df.at[index, 'latitude'] = lat
-                    df.at[index, 'longitude'] = lon
+                df.at[index, 'latitude'] = lat
+                df.at[index, 'longitude'] = lon
 
             elif pd.notnull(row['country_txt']):
                 country = row['country_txt']
                 lat, lon = get_lat_long('country', country)
-                if lat is not None and lon is not None:
-                    df.at[index, 'latitude'] = lat
-                    df.at[index, 'longitude'] = lon
+                df.at[index, 'latitude'] = lat
+                df.at[index, 'longitude'] = lon
 
             else:
                 print(f"Missing both city and country for row {index}")
     return df
+
