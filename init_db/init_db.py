@@ -5,9 +5,9 @@ from clear_data import clear_all
 from models.date import get_date
 
 fields = ['nkill', 'nwound', 'nperps', 'longitude', 'latitude', 'attacktype1_txt',
-          'country_txt', 'city', 'iyear', 'imonth', 'iday', 'region_txt', 'gname']
+          'country_txt', 'city', 'iyear', 'imonth', 'iday', 'region_txt', 'gname', 'targtype1_txt']
 
-df_ = pd.read_csv('../data/globalterrorismdb.csv',
+df_ = pd.read_csv('../data/globalterrorismdb_0718dist-1000 rows.csv',
                  skipinitialspace=True,
                  usecols=fields,
                  encoding='latin1') \
@@ -33,16 +33,16 @@ def create_db_objects(data):
     date_id = date_obj.date_id
 
     location_obj = get_or_create(Location, {
-        'country': data['country'],
+        'country': data['country_txt'],
         'city': data['city'],
-        'region': data['region']
+        'region': data['region_txt']
     }, lambda: create_location_obj(data))
     location_id = location_obj.loc_id
 
-    target_type_obj = get_or_create(TargetType, {'target_type_id': data['target_type_id']}, lambda: create_target_type_obj(data))
+    target_type_obj = get_or_create(TargetType, {'target_type': data['targtype1_txt']}, lambda: create_target_type_obj(data))
     target_type_id = target_type_obj.target_type_id
 
-    terror_group_obj = get_or_create(TerrorGroup, {'gang_id': data['gang_id']}, lambda: create_terror_group_obj(data))
+    terror_group_obj = get_or_create(TerrorGroup, {'gang_name': data['gname']}, lambda: create_terror_group_obj(data))
     terror_group_id = terror_group_obj.gang_id
 
     attack_obj = create_attack_obj(data, attack_type_id, date_id, location_id, target_type_id, terror_group_id)
@@ -61,8 +61,15 @@ def add_objects_to_db(*objects):
 
 def init_db(data):
     try:
-        attack_type_id, date_id, location_id, target_type_id, terror_group_id, attack_obj = create_db_objects(data)
-        if attack_type_id & date_id & location_id & target_type_id & terror_group_id & attack_obj:
-            return "data inserted sucssufoly"
+        for index, row in data.iterrows():
+            attack_type_id, date_id, location_id, target_type_id, terror_group_id, attack_obj = create_db_objects(row)
+            if attack_type_id and date_id and location_id and target_type_id and terror_group_id and attack_obj:
+                print("still working")
+            else:
+                print("error")
+        return "data inserted successfully"
     except Exception as e:
         print(f"Error processing message: {e}")
+
+init_db(df)
+
