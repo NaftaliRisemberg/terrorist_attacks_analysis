@@ -21,9 +21,14 @@ def get_or_create(table_class, search_fields, create_func):
     if obj:
         return obj
     else:
-        new_obj = create_func()
-        add_objects_to_db(new_obj)
-        return new_obj
+        try:
+            new_obj = create_func()
+            add_objects_to_db(new_obj)
+            return new_obj
+        except Exception as e:
+            print(f"Error creating {table_class.__name__}: {e}")
+            return None
+
 
 def create_db_objects(data):
     attack_type_obj = get_or_create(AttackType, {'attack_type': data['attacktype1_txt']}, lambda: create_attack_type_obj(data))
@@ -45,7 +50,7 @@ def create_db_objects(data):
     terror_group_obj = get_or_create(TerrorGroup, {'gang_name': data['gname']}, lambda: create_terror_group_obj(data))
     terror_group_id = terror_group_obj.gang_id
 
-    attack_obj = create_attack_obj(data, attack_type_id, date_id, location_id, target_type_id, terror_group_id)
+    attack_obj = create_attack_obj(data, target_type_id, attack_type_id, location_id, date_id, terror_group_id)
     add_objects_to_db(attack_obj)
 
     return attack_type_id, date_id, location_id, target_type_id, terror_group_id, attack_obj
