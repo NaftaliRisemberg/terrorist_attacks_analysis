@@ -1,6 +1,6 @@
 import uuid
-from uuid import uuid4
-from sqlalchemy import Column, Integer, ForeignKey, Float, String, UUID
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, Integer, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -10,9 +10,9 @@ class Attack(Base):
     attack_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     target_type_id = Column(UUID(as_uuid=True), ForeignKey('target_types.target_type_id'))
     attack_type_id = Column(UUID(as_uuid=True), ForeignKey('attack_types.att_type_id'))
-    num_kill = Column(Float)
-    num_wound = Column(Float)
-    victims = Column(Float)
+    num_kill = Column(Integer, nullable=False)
+    num_wound = Column(Integer, nullable=False)
+    victims = Column(Integer, nullable=False)
     lat = Column(Float, nullable=False)
     long = Column(Float, nullable=False)
     location_id = Column(UUID(as_uuid=True), ForeignKey('locations.loc_id'), nullable=False)

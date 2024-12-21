@@ -1,13 +1,13 @@
 import uuid
-
-from sqlalchemy import Column, Integer, String, UUID
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from database import Base
 
 class TargetType(Base):
     __tablename__ = 'target_types'
 
-    target_type_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    target_type_id = Column(UUID, primary_key=True, default=uuid.uuid4)
     target_type = Column(String, nullable=False)
 
     attacks = relationship('Attack', back_populates='target_types')
