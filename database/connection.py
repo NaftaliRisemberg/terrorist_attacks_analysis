@@ -1,7 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from database import Base
-from database.config import POSTGRES_URL
+import os
+from dotenv import load_env
+
+POSTGRES_URL = os.getenv('POSTGRES_URL')
 
 engine = create_engine(POSTGRES_URL)
 DBSession = sessionmaker(autocommit=False,
