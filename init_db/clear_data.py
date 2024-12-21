@@ -3,10 +3,12 @@ from requests.structures import CaseInsensitiveDict
 import pandas as pd
 import time
 import os
-from dotenv import load_env
+from dotenv import load_dotenv
+
+load_dotenv()
 
 API_KEY = os.getenv('CORRODES_API_KEY')
-CORRODES_URL = os.getenv('CORRODES_URL')
+CORRODES_URL = os.getenv('CORRODES_API_URL')
 
 def clear_all(df):
     df = clean_missing_dates(df)

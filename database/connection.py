@@ -2,7 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from database import Base
 import os
-from dotenv import load_env
+from dotenv import load_dotenv
+
+load_dotenv()
 
 POSTGRES_URL = os.getenv('POSTGRES_URL')
 
