@@ -65,11 +65,13 @@ def add_objects_to_db(*objects):
         print(f"Error adding objects to session: {e}")
 
 def init_db(data):
+    counter = 0
     try:
         for index, row in data.iterrows():
             attack_type_id, date_id, location_id, target_type_id, terror_group_id, attack_obj = create_db_objects(row)
             if attack_type_id and date_id and location_id and target_type_id and terror_group_id and attack_obj:
-                print("still working")
+                counter += 1
+                print(f'still working, counter: {counter}')
             else:
                 print("error")
         return "data inserted successfully"
