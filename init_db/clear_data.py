@@ -11,11 +11,11 @@ API_KEY = os.getenv('CORRODES_API_KEY')
 CORRODES_URL = os.getenv('CORRODES_API_URL')
 
 def clear_all(df):
-    df = to_ints(df, 'nkill', 'nwound', 'nperps')
-    df = to_none(df, df.columns)
     df = clean_missing_dates(df)
     df = replace_missing_nperps(df)
     df = fill_missing_lat_lon(df)
+    df = to_ints(df, 'nkill', 'nwound', 'nperps')
+    df = to_none(df, *df.columns)
     return df
 
 def clean_missing_dates(df):
@@ -24,7 +24,7 @@ def clean_missing_dates(df):
     return drop_missing_dates
 
 def replace_missing_nperps(df):
-    df['nperps'] = df['nperps'].map({-99: 0})
+    df['nperps'] = df['nperps'].map({-99: None})
     df['nperps'] = df['nperps'].infer_objects()
     return df
 
