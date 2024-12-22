@@ -10,9 +10,9 @@ def get_attack_types():
         data = get_most_attack_types(count)
 
         return jsonify([{
-            'attack_name': attack_type[0],
-            'score': attack_type[1]
-        } for attack_type in data])
+            'attack_name': row[0],
+            'score': row[1]
+        } for row in data])
 
     except Exception as e:
         print(f"Error: {e}")
