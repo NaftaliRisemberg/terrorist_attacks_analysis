@@ -9,7 +9,7 @@ class Location(Base):
 
     loc_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     country = Column(String, nullable=False)
-    city = Column(String, nullable=False)
+    city = Column(String)
     region = Column(String, nullable=False)
 
     attacks = relationship('Attack', back_populates='locations')
