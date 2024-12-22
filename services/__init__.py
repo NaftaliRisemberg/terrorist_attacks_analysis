@@ -1,3 +1,3 @@
 from .attacke_service import get_most_attack_types
-from .region_service import get_victims_per_event_by_region
+from .region_service import get_victims_per_event_by_region, get_attack_trends_by_region
 from .terror_groups_service import get_most_damaging_terror_groups
