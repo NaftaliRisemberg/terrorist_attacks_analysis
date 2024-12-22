@@ -7,7 +7,7 @@ from models.date import get_date
 fields = ['nkill', 'nwound', 'nperps', 'longitude', 'latitude', 'attacktype1_txt',
           'country_txt', 'city', 'iyear', 'imonth', 'iday', 'region_txt', 'gname', 'targtype1_txt']
 
-df_ = pd.read_csv('../data/globalterrorismdb_0718dist-1000 rows.csv',
+df_ = pd.read_csv('../data/globalterrorismdb.csv',
                  skipinitialspace=True,
                  usecols=fields,
                  encoding='latin1') \
