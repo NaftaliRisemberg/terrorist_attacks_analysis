@@ -1,6 +1,9 @@
+from pandas.core.computation.expressions import where
+
 from database import session
 from models import *
-from sqlalchemy import func
+from sqlalchemy import func, case, select
+
 
 def get_victims_per_event_by_region(count):
     sum_victims = (func.sum(Attack.num_kill) + func.sum(Attack.num_wound)).label('sum_victims')
@@ -20,39 +23,29 @@ def get_victims_per_event_by_region(count):
     )
     return data
 
-
-def get_attack_trends_by_region(base_year, compare_to_year, count):
-    year = func.extract('year', DateModel.date_id).label('year')
-    attack_count = func.count(Attack.attack_id).label('attack_count')
+def calculate_percent_change(base_year, compare_to_year, count):
+    year = func.extract('year', DateModel.date).label('year')
+    base_year_count = func.count(Attack.attack_id).filter(year == base_year).label('base_year_count')
+    compare_to_year_count = func.count(Attack.attack_id).filter(year == compare_to_year).label('compare_to_year_count')
+    change_percent = case((base_year_count != 0, compare_to_year_count - base_year_count * 100 / base_year_count),else_=100)
 
     data = (
         session.query(
             Location.region,
-            attack_count,
-            year
+            change_percent
         )
         .join(Location, Attack.location_id == Location.loc_id)
         .join(DateModel, Attack.date_id == DateModel.date_id)
         .filter(year.in_([base_year, compare_to_year]))
-        .group_by(Location.region, year)
-        .order_by(Location.region)
+        .group_by(Location.region)
+        .order_by(change_percent.desc())
+        .limit(count)
         .all()
     )
+    return data
 
-    region_trends = {}
 
-    for region, attack_count, year in data:
-        if region not in region_trends:
-            region_trends[region] = {}
-        region_trends[region][year] = attack_count
 
-    percentage_changes = []
-    for region, years in region_trends.items():
-        if base_year in years and compare_to_year in years:
-            start_count = years[base_year]
-            end_count = years[compare_to_year]
-            if start_count != 0:
-                percentage_change = ((end_count - start_count) / start_count) * 100
-                percentage_changes.append((region, percentage_change))
 
-    return percentage_changes
+
+
