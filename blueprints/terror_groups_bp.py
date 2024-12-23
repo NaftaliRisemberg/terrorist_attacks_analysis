@@ -30,3 +30,13 @@ def get_most_active_groups_by_region():
 
     except Exception as e:
         print(f"Error: {e}")
+
+@terror_groups_bp.route("/groups_shared_attacks", methods=['GET'])
+def get_terror_groups_involved_in_same_attack():
+    try:
+        data = find_terror_groups_involved_in_same_attack()
+
+        return jsonify(data)
+
+    except Exception as e:
+        print(f"Error: {e}")
