@@ -17,7 +17,7 @@ def get_victims_by_region():
     except Exception as e:
         print(f"Error: {e}")
 
-@region_bp.route("/get_rate_attack_trends_by_region", methods=['GET'])
+@region_bp.route("/attack_trends_by_region", methods=['GET'])
 def get_percent_change_by_years():
     base_year  = request.args.get('base_year', type=int)
     compare_to_year = request.args.get('compare_to_year', type=int)
