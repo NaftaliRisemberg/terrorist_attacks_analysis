@@ -17,3 +17,16 @@ def get_most_damaging_groups():
     except Exception as e:
         print(f"Error: {e}")
 
+@terror_groups_bp.route("/most_active_groups", methods=['GET'])
+def get_most_active_groups_by_region():
+    region = request.args.get('region', type=str)
+    try:
+        data = calculate_most_active_groups(region)
+
+        return jsonify([{
+            'terror group name': row[0],
+            'attacks number': row[1]
+        } for row in data])
+
+    except Exception as e:
+        print(f"Error: {e}")
