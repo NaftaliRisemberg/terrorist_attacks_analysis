@@ -10,7 +10,7 @@ def get_most_damaging_terror_groups(count):
             TerrorGroup.gang_name,
             sum_victims,
         )
-        .join(TerrorGroup, Attack.terror_group_id == TerrorGroup.gang_id)
+        .join(TerrorGroup.attacks)
         .group_by(TerrorGroup.gang_name)
         .order_by(sum_victims.desc())
         .limit(count)
@@ -25,8 +25,8 @@ def calculate_most_active_groups(region=None):
             TerrorGroup.gang_name,
             sum_attacks
         )
-        .join(Attack, Attack.terror_group_id == TerrorGroup.gang_id)
-        .join(Location, Attack.location_id == Location.loc_id)
+        .join(Attack.terror_groups)
+        .join(Attack.locations)
     )
 
     if region:

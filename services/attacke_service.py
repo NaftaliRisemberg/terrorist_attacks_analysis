@@ -9,7 +9,7 @@ def get_most_attack_types(count):
             AttackType.attack_type,
             sum_score
         )
-        .join(AttackType, Attack.attack_type_id == AttackType.att_type_id)
+        .join(Attack.attack_types)
         .group_by(AttackType.attack_type)
         .order_by(sum_score.desc())
         .limit(count)
