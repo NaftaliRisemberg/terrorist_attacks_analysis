@@ -3,15 +3,15 @@ from services import *
 
 region_bp = Blueprint('region_bp', __name__)
 
-@region_bp.route("/victims_by_region", methods=['GET'])
+@region_bp.route("/average_victims_per_events_by_region", methods=['GET'])
 def get_victims_by_region():
     count = request.args.get('count', type=int)
     try:
-        data = get_victims_per_event_by_region(count)
+        data = calculate_average_victims_per_event_by_region(count)
 
         return jsonify([{
             'region': row[0],
-            'victims': row[1]
+            'average number of victims per event': round(row[1], 3)
         } for row in data])
 
     except Exception as e:
@@ -28,7 +28,7 @@ def get_percent_change_by_years():
 
         return jsonify([{
             'region': row[0],
-            'present': row[1]
+            'present': round(row[1], 3)
         } for row in data])
 
     except Exception as e:

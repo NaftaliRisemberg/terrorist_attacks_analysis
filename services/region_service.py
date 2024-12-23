@@ -2,8 +2,7 @@ from database import session
 from models import *
 from sqlalchemy import func, case
 
-
-def get_victims_per_event_by_region(count):
+def calculate_average_victims_per_event_by_region(count):
     sum_victims = (func.sum(Attack.num_kill) + func.sum(Attack.num_wound)).label('sum_victims')
     sum_events = func.count(Attack.attack_id).label('event_count')
     average_victims_per_event = (sum_victims / sum_events).label('avg_victims_per_event')
@@ -11,9 +10,9 @@ def get_victims_per_event_by_region(count):
     data = (
         session.query(
             Location.region,
-            sum_victims,
+            average_victims_per_event,
         )
-        .join(Location, Attack.location_id == Location.loc_id)
+        .join(Attack.locations)
         .group_by(Location.region)
         .order_by(average_victims_per_event.desc())
         .limit(count)
@@ -32,8 +31,8 @@ def calculate_percent_change(base_year, compare_to_year, count):
             Location.region,
             change_percent
         )
-        .join(Location, Attack.location_id == Location.loc_id)
-        .join(DateModel, Attack.date_id == DateModel.date_id)
+        .join(Attack.locations)
+        .join(Attack.dates)
         .filter(year.in_([base_year, compare_to_year]))
         .group_by(Location.region)
         .order_by(change_percent.desc())
