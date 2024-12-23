@@ -14,7 +14,7 @@ class Attack(Base):
     num_wound = Column(Integer, nullable=False)
     victims = Column(Integer, nullable=False)
     lat = Column(Float, nullable=False)
-    long = Column(Float, nullable=False)
+    lon = Column(Float, nullable=False)
     location_id = Column(UUID(as_uuid=True), ForeignKey('locations.loc_id'), nullable=False)
     date_id = Column(UUID(as_uuid=True), ForeignKey('dates.date_id'))
     terror_group_id = Column(UUID(as_uuid=True), ForeignKey('terror_groups.gang_id'), nullable=False)
@@ -35,7 +35,7 @@ def create_attack_obj(attack_data, target_id, attack_id, location_id, date_id, t
             num_wound=attack_data['nwound'],
             victims=attack_data['nkill'] + attack_data['nwound'],
             lat=attack_data['latitude'],
-            long=attack_data['longitude'],
+            lon=attack_data['longitude'],
             location_id=location_id,
             date_id=date_id,
             terror_group_id=terror_group_id,
