@@ -1,8 +1,6 @@
-from pandas.core.computation.expressions import where
-
 from database import session
 from models import *
-from sqlalchemy import func, case, select
+from sqlalchemy import func, case
 
 
 def get_victims_per_event_by_region(count):
