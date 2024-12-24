@@ -58,3 +58,50 @@ def calculate_target_with_most_groups(region=None, country=None):
     )
     return data
 
+def find_groups_with_shared_targets_same_year(year):
+    year_expr = func.extract('year', DateModel.date).label('attack_year')
+
+    subquery = (
+        session.query(
+            Attack.target_type_id,
+            year_expr,
+            func.count(Attack.terror_group_id).label('group_count')
+        )
+        .join(Attack.dates)
+        .group_by(Attack.target_type_id, year_expr)
+        .having(func.count(Attack.terror_group_id) > 1)
+        .subquery()
+    )
+
+    query = (
+        session.query(
+            TerrorGroup.gang_name,
+            Attack.target_type_id,
+            year_expr
+        )
+        .join(Attack.terror_groups)
+        .join(Attack.target_types)
+        .join(Attack.dates)
+        .filter(Attack.target_type_id == subquery.c.target_type_id)
+        .filter(year_expr == subquery.c.attack_year)
+    )
+
+    if year:
+        query = query.filter(year_expr == year)
+
+    data = query.all()
+
+    result = {}
+    for row in data:
+        gang_name = row.gang_name
+        target_type_id = str(row.target_type_id)
+        attack_year = int(row.attack_year)
+
+        if attack_year not in result:
+            result[attack_year] = {}
+        if target_type_id not in result[attack_year]:
+            result[attack_year][target_type_id] = []
+
+        result[attack_year][target_type_id].append(gang_name)
+
+    return result

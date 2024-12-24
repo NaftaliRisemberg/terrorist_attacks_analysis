@@ -27,3 +27,14 @@ def get_groups_with_shared_targets():
 
     except Exception as e:
         print(f"Error: {e}")
+
+@target_type_bp.route('/groups_with_shared_targets_same_year', methods=['GET'])
+def get_groups_with_shared_targets_in_same_year():
+    year = request.args.get('year', type=int)
+    try:
+        data = find_groups_with_shared_targets_same_year(year)
+
+        return jsonify(data)
+
+    except Exception as e:
+        print(f"Error: {e}")
