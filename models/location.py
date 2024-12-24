@@ -8,9 +8,9 @@ class Location(Base):
     __tablename__ = 'locations'
 
     loc_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    country = Column(String, nullable=False)
+    country = Column(String)
     city = Column(String)
-    region = Column(String, nullable=False)
+    region = Column(String)
 
     attacks = relationship('Attack', back_populates='locations')
 
