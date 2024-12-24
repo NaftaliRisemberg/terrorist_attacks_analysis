@@ -28,17 +28,20 @@ def replace_missing_nperps(df):
     df['nperps'] = df['nperps'].infer_objects()
     return df
 
-def get_lat_and_long_by_location(df):
-    is_city =  df['city'] != "Unknown"
+def get_lat_and_long_by_location(index, row):
+    is_city =  row['city'] != "Unknown" and row['city'] is not None
     if is_city:
-        city = df['city'].iloc[0]
-        lat, lon = get_lat_long(city, city)
+        city = row['city']
+        lat, lon = get_lat_lon('city', city)
+    elif row['country_txt'] != "Unknown" and row['country_txt'] is not None:
+        country = row['country_txt']
+        lat, lon = get_lat_lon('country', country)
     else:
-        country = df['country_txt'].iloc[0]
-        lat, lon = get_lat_long(country, country)
+        print(f"Missing both city and country for row {index}")
+        lat, lon = None, None
     return lat, lon
 
-def get_lat_long(location_type, location_name):
+def get_lat_lon(location_type, location_name):
     try:
         url = f"{CORRODES_URL}{location_type}={location_name}&apiKey={API_KEY}"
 
@@ -56,31 +59,22 @@ def get_lat_long(location_type, location_name):
         print(f"Error message: {e}")
 
 def fill_missing_lat_lon(df):
-    max_calls_per_minute = 100
+    max_calls_per_minute = 50000
     calls_counter = 0
     sleep_time = 60
 
     for index, row in df.iterrows():
         if pd.isnull(row['latitude']) or pd.isnull(row['longitude']):
-            if pd.notnull(row['city']) and row['city'] != "Unknown":
-                city = row['city']
-                lat, lon = get_lat_long('city', city)
-                df.at[index, 'latitude'] = lat
-                df.at[index, 'longitude'] = lon
-
-            elif pd.notnull(row['country_txt']):
-                country = row['country_txt']
-                lat, lon = get_lat_long('country', country)
-                df.at[index, 'latitude'] = lat
-                df.at[index, 'longitude'] = lon
-
-            else:
-                print(f"Missing both city and country for row {index}")
+            lat, lon = get_lat_and_long_by_location(index, row)
+            df.at[index, 'latitude'] = lat
+            df.at[index, 'longitude'] = lon
+            calls_counter += 1
 
         if calls_counter >= max_calls_per_minute:
             print(f"API limit reached, sleeping for {sleep_time} seconds.")
             time.sleep(sleep_time)
             calls_counter = 0
+
     return df
 
 def to_ints(df, *fields):
